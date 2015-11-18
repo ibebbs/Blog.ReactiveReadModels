@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Blog.ReactiveReadModels.Event
 {
-    class OrderInvoiced
+    public class OrderInvoiced
     {
+        public Guid AccountId { get; private set; }
     }
 }

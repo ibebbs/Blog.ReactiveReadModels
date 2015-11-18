@@ -21,8 +21,12 @@ namespace Blog.ReactiveReadModels.Account
                 async observer =>
                 {
                     Service.AccountInfo accountInfo = await _accountService.GetAccountInfoAsync(id);
+                    
+                    IObservable<Func<ReadModel, ReadModel>> mutators = Observable.Merge(
+                        _bus.GetEvent<Event.AccountNameChanged>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.WithNameChanged)
+                    );
 
-                    return Observable.Empty<ReadModel>().Subscribe(observer);
+                    return mutators.Scan(accountInfo.ToReadModel(), (rm, m) => m(rm)).Subscribe(observer);
                 }
             );
         }

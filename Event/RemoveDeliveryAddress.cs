@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Blog.ReactiveReadModels.Event
 {
-    class RemoveDeliveryAddress
+    public class RemoveDeliveryAddress
     {
+        public Guid AccountId { get; private set; }
     }
 }
