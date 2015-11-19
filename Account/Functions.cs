@@ -20,6 +20,16 @@ namespace Blog.ReactiveReadModels.Account
             return new ReadModel(readModel.Id, readModel.Name, readModel.DeliveryAddresses, readModel.BillingAddresses.Where(address => !string.Equals(address.Name, addressName, StringComparison.CurrentCultureIgnoreCase)), readModel.OrderHistory, readModel.CurrentOrders);
         }
 
+        public static ReadModel WithCurrentOrder(this ReadModel readModel, Order order)
+        {
+            return new ReadModel(readModel.Id, readModel.Name, readModel.DeliveryAddresses, readModel.BillingAddresses, readModel.CurrentOrders.Concat(new[] { order }), readModel.OrderHistory);
+        }
+
+        public static ReadModel WithCompletedOrder(this ReadModel readModel, Guid orderId)
+        {
+            return new ReadModel(readModel.Id, readModel.Name, readModel.DeliveryAddresses, readModel.BillingAddresses, readModel.CurrentOrders.Where(order => !orderId.Equals(order.Id)), readModel.OrderHistory.Concat(readModel.CurrentOrders.Where(order => orderId.Equals(order.Id))));
+        }
+
         public static Func<ReadModel, ReadModel> Apply(Event.AccountNameChanged @event)
         {
             return readModel => readModel.WithAccountName(@event.AccountName);
@@ -33,6 +43,16 @@ namespace Blog.ReactiveReadModels.Account
         public static Func<ReadModel, ReadModel> Apply(Event.RemoveBillingAddress @event)
         {
             return readModel => readModel.WithoutBillingAddress(@event.AddressName);
+        }
+
+        public static Func<ReadModel, ReadModel> Apply(Event.OrderInvoiced @event)
+        {
+            return readModel => readModel.WithCurrentOrder(new Order(@event.OrderId));
+        }
+
+        public static Func<ReadModel, ReadModel> Apply(Event.OrderDispatched @event)
+        {
+            return readModel => readModel.WithCompletedOrder(@event.OrderId);
         }
 
         public static ReadModel ToReadModel(this Service.AccountInfo accountInfo)

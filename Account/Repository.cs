@@ -27,7 +27,9 @@ namespace Blog.ReactiveReadModels.Account
                     IObservable<Func<ReadModel, ReadModel>> mutators = Observable.Merge(
                         _bus.GetEvent<Event.AccountNameChanged>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
                         _bus.GetEvent<Event.AddBillingAddress>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
-                        _bus.GetEvent<Event.RemoveBillingAddress>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply)
+                        _bus.GetEvent<Event.RemoveBillingAddress>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
+                        _bus.GetEvent<Event.OrderInvoiced>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
+                        _bus.GetEvent<Event.OrderDispatched>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply)
                     );
 
                     return mutators.Scan(accountInfo.ToReadModel(), (readModel, mutator) => mutator(readModel)).Subscribe(observer);

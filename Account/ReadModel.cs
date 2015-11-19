@@ -6,13 +6,9 @@ namespace Blog.ReactiveReadModels.Account
 {
     public class ReadModel
     {
-        public ReadModel(
-            Guid id, 
-            string name, 
-            IEnumerable<Address> deliveryAddresses, 
-            IEnumerable<Address> billingAddresses,
-            IEnumerable<Order> orderHistory,
-            IEnumerable<Order> currentOrders)
+        public ReadModel(Guid id, string name, 
+                         IEnumerable<Address> deliveryAddresses, IEnumerable<Address> billingAddresses,
+                         IEnumerable<Order> orderHistory, IEnumerable<Order> currentOrders)
         {
             Id = id;
             Name = name;
