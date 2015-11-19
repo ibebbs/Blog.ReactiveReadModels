@@ -17,16 +17,20 @@ namespace Blog.ReactiveReadModels.Account
 
         public IObservable<ReadModel> For(Guid id)
         {
+            if (id == null) throw new ArgumentNullException("id");
+
             return Observable.Create<ReadModel>(
                 async observer =>
                 {
                     Service.AccountInfo accountInfo = await _accountService.GetAccountInfoAsync(id);
                     
                     IObservable<Func<ReadModel, ReadModel>> mutators = Observable.Merge(
-                        _bus.GetEvent<Event.AccountNameChanged>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.WithNameChanged)
+                        _bus.GetEvent<Event.AccountNameChanged>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
+                        _bus.GetEvent<Event.AddBillingAddress>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply),
+                        _bus.GetEvent<Event.RemoveBillingAddress>().Where(@event => id.Equals(@event.AccountId)).Select(Functions.Apply)
                     );
 
-                    return mutators.Scan(accountInfo.ToReadModel(), (rm, m) => m(rm)).Subscribe(observer);
+                    return mutators.Scan(accountInfo.ToReadModel(), (readModel, mutator) => mutator(readModel)).Subscribe(observer);
                 }
             );
         }

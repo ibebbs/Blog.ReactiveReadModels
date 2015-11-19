@@ -16,10 +16,10 @@ namespace Blog.ReactiveReadModels.Account
         {
             Id = id;
             Name = name;
-            DeliveryAddresses = deliveryAddresses ?? Enumerable.Empty<Address>();
-            BillingAddresses = billingAddresses ?? Enumerable.Empty<Address>();
-            OrderHistory = orderHistory ?? Enumerable.Empty<Order>();
-            CurrentOrders = currentOrders ?? Enumerable.Empty<Order>();
+            DeliveryAddresses = (deliveryAddresses ?? Enumerable.Empty<Address>()).ToArray();
+            BillingAddresses = (billingAddresses ?? Enumerable.Empty<Address>()).ToArray();
+            OrderHistory = (orderHistory ?? Enumerable.Empty<Order>()).ToArray();
+            CurrentOrders = (currentOrders ?? Enumerable.Empty<Order>()).ToArray();
         }
 
         public Guid Id { get; private set; }
